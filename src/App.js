@@ -1,12 +1,17 @@
 import "./App.css";
-import { useState } from "react";
+import React, { useState } from "react";
 import Web3 from "web3";
-import Button from "react-bootstrap/Button";
+import { Button, Tooltip, OverlayTrigger } from "react-bootstrap";
 
 function App() {
   const [displayAddress, setDisplayAddress] = useState("Not Connected");
   const [wrongNetwork, setWrongNetwork] = useState("");
   const ropstenChainID = "0x3";
+  // const [channelAddress, setChannelAddress] = useState("");
+
+  React.useEffect(() => {
+    connectWallet();
+  }, []);
 
   const connectWallet = async () => {
     const web3 = new Web3(Web3.givenProvider || "http://localhost:8080");
@@ -35,26 +40,31 @@ function App() {
     });
   }
 
+  const renderTooltip = (props) => (
+    <Tooltip id="button-tooltip" {...props}>
+      Click to receive stream updates via EPNS
+    </Tooltip>
+  );
+
   return (
     <div className="App d-flex justify-content-center align-items-center">
-      <div className="col container">
-        <div className="row d-flex justify-content-center">
-          <div className="col-4 d-flex justify-content-end">
-            <Button variant="light" onClick={connectWallet}>
-              Connect Wallet
-            </Button>
-          </div>
-          <div className="col-4">
-            <Button variant="light" onClick={addToChannel}>
-              Notify Me
-            </Button>
-          </div>
+      <div className="col">
+        <div className="pb-4 d-flex justify-content-center">
+          <h4>{wrongNetwork}</h4>
         </div>
-        <div className="pt-4 d-flex justify-content-center">
+        <div className="pb-4 d-flex justify-content-center">
           <div>Address: {displayAddress}</div>
         </div>
-        <div className="pt-4 d-flex justify-content-center">
-          <h4>{wrongNetwork}</h4>
+        <div className="d-flex justify-content-center">
+          <OverlayTrigger
+            placement="top"
+            delay={{ show: 250, hide: 400 }}
+            overlay={renderTooltip}
+          >
+            <Button className="btn" variant="light" onClick={addToChannel}>
+              Notify Me
+            </Button>
+          </OverlayTrigger>
         </div>
       </div>
     </div>
