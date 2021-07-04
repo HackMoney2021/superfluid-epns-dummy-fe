@@ -69,7 +69,11 @@ function App() {
             delay={{ show: 250, hide: 400 }}
             overlay={renderTooltip}
           >
-            <Button className="btn" variant="light" onClick={addToChannel}>
+            <Button
+              className="btn"
+              variant="outline-dark"
+              onClick={addToChannel}
+            >
               Notify Me
             </Button>
           </OverlayTrigger>
