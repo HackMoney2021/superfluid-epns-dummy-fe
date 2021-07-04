@@ -3,6 +3,9 @@ import { useState } from "react";
 import Web3 from "web3";
 import Button from "react-bootstrap/Button";
 
+// services
+import NotificationsService from "./services/NotificationsService";
+
 function App() {
   const [displayAddress, setDisplayAddress] = useState("Not Connected");
   const [wrongNetwork, setWrongNetwork] = useState("");
@@ -15,6 +18,9 @@ function App() {
     else setWrongNetwork("Unsupported network, please connect to Ropsten");
     const accounts = await web3.eth.getAccounts();
     setDisplayAddress(accounts[0]);
+
+    // initialise notifications service
+    NotificationsService.initialise();
   };
 
   const addToChannel = () => {
@@ -23,6 +29,8 @@ function App() {
     //    direct -> user opts in via on-chain event
     //    indirect -> channel can sub user (via address) on thei behalf
     //        (not ideal as if user unsubs they cannt be indirectly added again)
+
+    NotificationsService.registerForNotifications();
   };
 
   if (window.ethereum) {

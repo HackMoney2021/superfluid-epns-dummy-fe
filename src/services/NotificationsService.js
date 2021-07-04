@@ -1,44 +1,49 @@
-import NotificationHelper from "@epnsproject/backend-sdk";
-import { ExceptionHandler } from "winston";
 import EPNS_ABI from "../contracts/epnscore.json";
+import Web3 from "web3";
 
 require("dotenv").config();
 
 class NotificationsService{
     constructor(){
-        this.epnsHelper = null;
         this.epnsContractAddress = "0xc882dA9660d29c084345083922F8a9292E58787D";
-        this.sdk = null;
+        this.web3 = null;
+        this.epnsContract = null;
     }
 
     /**epns config
      * 
-     * follow the steps on the epns github repo for inisialising their sdk kit
+     * Set up the web3 contract for front end interactiong
      * 
-     * potential problems: the network tab within epnsSettings are not defined - it may not be a string
+     * @returns {bool} initialised - returns true if the web3 object and contract are initialised successfully
      */
     initialise(){
-        const infuraSettings = {
-            projectID: process.env.infura_proj_id,
-            projectSecret: process.env.infura_proj_secret
-        };
-
-        const settings = {
-            infura: infuraSettings
-        };
-
-        const epnsSettings = {
-            network: "ropsten",
-            contractAddress: this.epnsContractAddress,
-            contractABI: EPNS_ABI
-        }
-
-        // create an instance of the epns helper
-        this.sdk = NotificationHelper("ropsten", process.env.notif_priv_key, settings, epnsSettings);
-        
-        // return true if sdk initialises correctly
-        return this.sdk !== null ? true : false;
+        const web3 = new Web3(Web3.givenProvider || "http://localhost:8080");
+        this.web3 = web3;
+        this.epnsContract = new web3.eth.Contract(EPNS_ABI, this.epnsContractAddress)
+        return this.web3 !== null && this.epnsContract !== null;
     }
+
+
+    registerForNotifications(){
+        // sanity checks
+        if (this.web3 == null) throw new Error("web3 not initialised");
+        if (this.epnsContract == null) throw new Error("epns contract not initialised");
+
+        // initialisation
+        const msgSender = this.web3.currentProvider.selectedAddress;
+        const channelAddress = "0xa1016081D6Da53b4246178eD83922C55F7171e54";
+
+        // make call to contract
+        this.epnsContract.methods.subscribe(channelAddress)
+            .send({
+                from: msgSender
+            })
+            .then(response => console.log(response))
+            .catch(err => console.log(err));
+
+    }
+
+
 
     /**Send Notification 
      * 
@@ -57,3 +62,6 @@ class NotificationsService{
 
 
 }
+
+const notificationsService = new NotificationsService();
+export default notificationsService;
