@@ -12,9 +12,9 @@ function App() {
   const ropstenChainID = "0x3";
   // const [channelAddress, setChannelAddress] = useState("");
 
-  React.useEffect(() => {
-    connectWallet();
-  }, []);
+  // React.useEffect(() => {
+
+  // }, []);
 
   const connectWallet = async () => {
     const web3 = new Web3(Web3.givenProvider || "http://localhost:8080");
@@ -64,6 +64,13 @@ function App() {
           <div>Address: {displayAddress}</div>
         </div>
         <div className="d-flex justify-content-center">
+          <Button
+            className="btn"
+            variant="outline-dark"
+            onClick={connectWallet}
+          >
+            Connect Wallet
+          </Button>
           <OverlayTrigger
             placement="top"
             delay={{ show: 250, hide: 400 }}
